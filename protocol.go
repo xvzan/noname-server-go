@@ -10,6 +10,7 @@ func handleMessage(c *Client, msg []byte) {
 		c.Mutex.Lock()
 		c.Beat = false
 		c.Mutex.Unlock()
+		// log.Println("[心跳]", c.ID, "已收到心跳包")
 		return
 	}
 
@@ -26,7 +27,7 @@ func handleMessage(c *Client, msg []byte) {
 	var message []interface{}
 	unmarshalerr := json.Unmarshal(msg, &message)
 	if unmarshalerr != nil {
-		// log.println(unmarshalerr)
+		// log.Println(unmarshalerr)
 		return
 	}
 	// log.Println("[接收到消息]", message)
@@ -90,7 +91,7 @@ func handleMessage(c *Client, msg []byte) {
 				if strSlice, ok := message[2].([]string); ok {
 					if isKeyBanned(strSlice[0]) {
 						bannedIps[c.Conn.RemoteAddr().String()] = true
-						// log.println("IP banned:", c.Conn.RemoteAddr().String())
+						// log.Println("IP banned:", c.Conn.RemoteAddr().String())
 						c.Conn.Close()
 						return
 					}

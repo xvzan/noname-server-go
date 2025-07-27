@@ -19,7 +19,7 @@ var (
 func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		// log.println("Upgrade failed:", err)
+		// log.Println("Upgrade failed:", err)
 		return
 	}
 
@@ -27,7 +27,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	ip := r.RemoteAddr
 	if bannedIps[ip] {
 		conn.WriteMessage(websocket.TextMessage, []byte("denied:banned"))
-		// log.println("Banned IP:", ip)
+		// log.Println("Banned IP:", ip)
 		conn.Close()
 		return
 	}
@@ -67,14 +67,14 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 				clientsLock.Lock()
 				delete(clients, wsid)
 				clientsLock.Unlock()
-				// log.println("[WebSocket 关闭] clientID:", wsid)
+				// log.Println("[WebSocket 关闭] clientID:", wsid)
 				conn.Close()
 			}
 		}()
 		for {
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
-				// log.println("[WebSocket 读取失败] clientID:", wsid, "错误:", err)
+				// log.Println("[WebSocket 读取失败] clientID:", wsid, "错误:", err)
 				break
 			}
 			handleMessage(client, msg)

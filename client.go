@@ -36,13 +36,13 @@ func (c *Client) startHeartbeat() {
 	ticker := time.NewTicker(60 * time.Second)
 	defer ticker.Stop()
 	for range ticker.C {
-		// log.printf("[心跳] clientID: %s → 当前值 %t\n", c.ID, c.Beat)
+		// log.Printf("[心跳] clientID: %s → 当前值 %t\n", c.ID, c.Beat)
 		c.Mutex.Lock()
 		c.Conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
-		err := c.Conn.WriteMessage(websocket.BinaryMessage, []byte("heartbeat"))
+		err := c.Conn.WriteMessage(websocket.TextMessage, []byte("heartbeat"))
 		if err != nil {
 			if c.Beat {
-				// log.printf("[心跳失败] clientID: %s → 错误: %v\n", c.ID, err)
+				// log.Printf("[心跳失败] clientID: %s → 错误: %v\n", c.ID, err)
 				c.Conn.Close()
 				c.Mutex.Unlock()
 				break
@@ -79,7 +79,7 @@ func (c *Client) closeClient(id string) {
 	target, exists := clients[id]
 	clientsLock.Unlock()
 	if exists && target.Owner == c {
-		// log.println("[关闭客户端] clientID:", target.ID)
+		// log.Println("[关闭客户端] clientID:", target.ID)
 		target.Conn.Close()
 	}
 }
