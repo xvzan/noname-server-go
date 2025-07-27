@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 )
 
 func handleMessage(c *Client, msg []byte) {
@@ -27,10 +26,10 @@ func handleMessage(c *Client, msg []byte) {
 	var message []interface{}
 	unmarshalerr := json.Unmarshal(msg, &message)
 	if unmarshalerr != nil {
-		fmt.Println(unmarshalerr)
+		// log.println(unmarshalerr)
 		return
 	}
-	// fmt.Println("[接收到消息]", message)
+	// log.Println("[接收到消息]", message)
 
 	if message[0] == "server" && len(message) >= 2 {
 		cmd := message[1]
@@ -91,6 +90,7 @@ func handleMessage(c *Client, msg []byte) {
 				if strSlice, ok := message[2].([]string); ok {
 					if isKeyBanned(strSlice[0]) {
 						bannedIps[c.Conn.RemoteAddr().String()] = true
+						// log.println("IP banned:", c.Conn.RemoteAddr().String())
 						c.Conn.Close()
 						return
 					}

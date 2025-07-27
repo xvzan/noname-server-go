@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -61,7 +60,7 @@ func updateRooms() {
 }
 
 func EnterRoom(client *Client, key string, nickname, avatar string) {
-	defer fmt.Println("EnterRoom completed for", client.ID, "in room", key)
+	// defer log.Println("EnterRoom completed for", client.ID, "in room", key)
 	client.Nickname = trimNickname(nickname)
 	client.Avatar = avatar
 	roomMu.Lock()
