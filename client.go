@@ -9,13 +9,13 @@ import (
 )
 
 type Client struct {
-	ID         string
-	Conn       *websocket.Conn
-	Nickname   string
-	Avatar     string
-	Room       *Room
-	Owner      *Client
-	Send       chan []byte
+	ID       string
+	Conn     *websocket.Conn
+	Nickname string
+	Avatar   string
+	Room     *Room
+	Owner    *Client
+	// Send       chan []byte
 	Beat       bool
 	ServerMode bool
 	Status     string
@@ -24,13 +24,13 @@ type Client struct {
 	Mutex      sync.Mutex
 }
 
-func (c *Client) writePump() {
-	for msg := range c.Send {
-		if err := c.Conn.WriteMessage(websocket.TextMessage, msg); err != nil {
-			break
-		}
-	}
-}
+// func (c *Client) writePump() {
+// 	for msg := range c.Send {
+// 		if err := c.Conn.WriteMessage(websocket.TextMessage, msg); err != nil {
+// 			break
+// 		}
+// 	}
+// }
 
 func (c *Client) startHeartbeat() {
 	ticker := time.NewTicker(60 * time.Second)
@@ -57,7 +57,8 @@ func (c *Client) sendl(parts []interface{}) {
 		return
 	}
 	// fmt.Printf("[发送消息] clientID: %s → 内容: %s\n", c.ID, string(msg))
-	c.Send <- msg
+	c.Conn.WriteMessage(websocket.TextMessage, msg)
+	// c.Send <- msg
 }
 
 func (c *Client) sendTo(id string, message string) {
@@ -65,7 +66,7 @@ func (c *Client) sendTo(id string, message string) {
 	target, exists := clients[id]
 	clientsLock.Unlock()
 	if exists && target.Owner == c {
-		target.Send <- []byte(message)
+		target.Conn.WriteMessage(websocket.TextMessage, []byte(message))
 	}
 }
 

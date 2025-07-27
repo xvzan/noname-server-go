@@ -68,16 +68,20 @@ func handleMessage(c *Client, msg []byte) {
 			if len(message) >= 3 {
 				room := c.Room
 				if room != nil && room.Owner == c {
-					if config, ok := message[2].(map[string]interface{}); ok {
-						room.Config = config
-						c.sendl(modifyMessage(append([]interface{}{"roomconfig"}, room.Key, config)))
+					if room.ServerMode {
+						room.ServerMode = false
+					}
+					if c._OnConfig != nil {
+						c._OnConfig = nil
 						clientsLock.Lock()
-						for _, client := range clients {
-							if client.Room == room && client != c {
-								client.sendl(modifyMessage(append([]interface{}{"roomconfig"}, room.Key, config)))
-							}
+						if clients[c._OnConfig.ID] == nil {
+							c._OnConfig.Owner = c
+							c.sendl(modifyMessage([]string{"onconnection", c._OnConfig.ID}))
 						}
 						clientsLock.Unlock()
+					}
+					if config, ok := message[2].(map[string]interface{}); ok {
+						room.Config = config
 					}
 				}
 			}

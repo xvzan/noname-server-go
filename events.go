@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Event struct {
@@ -58,7 +60,7 @@ func CreateOrUpdateEvent(client *Client, cfg map[string]string, id string, mode 
 	}
 
 	newEvent := Event{
-		ID:       generateID(),
+		ID:       uuid.NewString(),
 		UTC:      eventUTC,
 		Day:      cfg["day"],
 		Hour:     cfg["hour"],

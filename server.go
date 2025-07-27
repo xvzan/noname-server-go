@@ -35,13 +35,13 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	client := &Client{
 		ID:   wsid,
 		Conn: conn,
-		Send: make(chan []byte, 256),
+		// Send: make(chan []byte, 256),
 	}
 	clientsLock.Lock()
 	clients[wsid] = client
 	clientsLock.Unlock()
 
-	go client.writePump()
+	// go client.writePump()
 	go client.startHeartbeat()
 
 	msg := modifyMessage([]interface{}{"roomlist", getRoomList(), getEventList(), getClientList(), wsid})
