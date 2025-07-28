@@ -70,6 +70,7 @@ func (c *Client) sendTo(id string, message string) {
 	target, exists := clients[id]
 	clientsLock.Unlock()
 	if exists && target.Owner == c {
+		// log.Printf("[发送消息] clientID: %s → 内容: %s\n", c.ID, string(message))
 		target.Conn.WriteMessage(websocket.TextMessage, []byte(message))
 	}
 }

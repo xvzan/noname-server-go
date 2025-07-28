@@ -52,6 +52,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			// log.Println("WS defer:", client.ID)
 			if client.Room != nil && client.Room.Owner == client {
+				// log.Println("[WebSocket 关闭] clientID:", client.ID, "房主离开，关闭房间")
 				clientsLock.Lock()
 				for _, c := range clients {
 					if c.Room == client.Room && c != client {
@@ -68,7 +69,11 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 				delete(clients, wsid)
 				clientsLock.Unlock()
 				// log.Println("[WebSocket 关闭] clientID:", wsid)
+				if client.Owner != nil {
+					client.Owner.sendl(modifyMessage([]string{"onclose", client.ID}))
+				}
 				conn.Close()
+				updateRooms()
 			}
 		}()
 		for {
@@ -77,6 +82,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 				// log.Println("[WebSocket 读取失败] clientID:", wsid, "错误:", err)
 				break
 			}
+			// log.Println("[WebSocket 接收消息] clientID:", wsid, "内容:", string(msg))
 			handleMessage(client, msg)
 		}
 	}()
